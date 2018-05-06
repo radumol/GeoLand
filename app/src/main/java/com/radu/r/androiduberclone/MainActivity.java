@@ -2,6 +2,7 @@ package com.radu.r.androiduberclone;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -64,11 +65,73 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btnSignIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showLoginDialog();
+            }
+        });
+
+
+    }
+
+    private void showLoginDialog() {
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("SIGN IN" );
+        dialog.setMessage("Please use email to sign in");
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View login_layout = inflater.inflate(R.layout.layout_login,null);
+
+        final MaterialEditText edtEmail = login_layout.findViewById(R.id.edtEmail);
+        final MaterialEditText edtPassword = login_layout.findViewById(R.id.edtPassword);
+
+        dialog.setView(login_layout);
+
+        //Set button
+        dialog.setPositiveButton("SIGN IN", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+
+                //Check validation
+                if(TextUtils.isEmpty(edtEmail.getText().toString())){
+                    Snackbar.make(rootLayout, "Please enter email address", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                if(TextUtils.isEmpty(edtPassword.getText().toString())){
+                    Snackbar.make(rootLayout, "Please enter password", Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                //Login
+                auth.signInWithEmailAndPassword(edtEmail.getText().toString(), edtPassword.getText().toString()).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult authResult) {
+                        startActivity(new Intent(MainActivity.this, Welcome.class));
+                        finish();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Snackbar.make(rootLayout,"Login failed"+e.getMessage(), Snackbar.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+
+        dialog.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
 
     }
 
     private void showRegisterDialog() {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        final AlertDialog.Builder dialog = new AlertDialog.Builder(this);
         dialog.setTitle("REGISTER" );
         dialog.setMessage("Please use email to register");
 
@@ -94,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
                 if(TextUtils.isEmpty(edtPhone.getText().toString())){
-                    Snackbar.make(rootLayout, "Please enter phone number", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(rootLayout, "Please enter phone number", Snackbar.LENGTH_LONG).show();
                     return;
                 }
                 if(TextUtils.isEmpty(edtPassword.getText().toString())){
@@ -118,22 +181,22 @@ public class MainActivity extends AppCompatActivity {
                         user.setPassword(edtPassword.getText().toString());
 
                         //Use email to key
-                        users.child(user.getEmail()).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        users.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Snackbar.make(rootLayout, "Register success fully", Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(rootLayout, "Register success fully", Snackbar.LENGTH_LONG).show();
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Snackbar.make(rootLayout, "Registration failed"+e.getMessage(), Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(rootLayout, "Registration failed"+e.getMessage(), Snackbar.LENGTH_LONG).show();
                             }
                         });
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Snackbar.make(rootLayout, "Registration failed"+e.getMessage(), Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(rootLayout, "Registration failed 2"+e.getMessage(), Snackbar.LENGTH_LONG).show();
                     }
                 });
 
@@ -148,9 +211,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         dialog.show();
-
-
-
-
     }
 }
