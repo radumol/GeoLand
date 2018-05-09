@@ -29,6 +29,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:15.0.0'
 
     //Add Library
+    implementation 'com.github.d-max:spots-dialog:0.7@aar'
     implementation 'uk.co.chrisjenx:calligraphy:2.3.0'
     implementation 'com.rengwuxian.materialedittext:library:2.1.4'
     implementation 'com.android.support:design:27.+'
